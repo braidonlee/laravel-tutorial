@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-    <h1>Edit Project</h1>
+    <h1 class="title">Edit Project</h1>
 
     <form method="POST" action="/projects/{{ $project->id }}" style="margin-bottom: 1em;">
         {{ method_field('PATCH') }}
@@ -10,14 +10,14 @@
         <div class="field">
             <label for="title" class="label">Title</label>
             <div class="control">
-                <input type="text" name="title" class="input" placeholder="Title" value="{{ $project->title }}">
+                <input type="text" name="title" class="input" placeholder="Title" value="{{ $project->title }}" required>
             </div>
         </div>
 
         <div class="field">
             <label for="description" class="label">Description</label>
             <div class="control">
-                <textarea name="description" class="textarea">{{ $project->description }}</textarea>
+                <textarea name="description" class="textarea" required>{{ $project->description }}</textarea>
             </div>
         </div>
 
