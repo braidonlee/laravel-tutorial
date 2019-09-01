@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProjectCreated;
 use App\Project;
 
 class ProjectsController extends Controller
@@ -14,7 +15,9 @@ class ProjectsController extends Controller
 
     public function index()
     {
-        $projects = Project::where('owner_id', auth()->id())->get();
+        // $projects = Project::where('owner_id', auth()->id())->get();
+
+        $projects = auth()->user()->projects;
 
         return view('projects.index', compact('projects'));
     }
@@ -44,14 +47,21 @@ class ProjectsController extends Controller
 
         $attributes['owner_id'] = auth()->id();
         
-        Project::create($attributes);
+        $project = Project::create($attributes);
         
+        event(new ProjectCreated($project));
+
         return redirect('/projects');
     }
 
     public function show(Project $project)
     {
         // $project = Project::findOrFail($id);
+        // abort_if($project->owner_id !== auth()->id(), 403);
+        // abort_if(\Gate::denies('update', $project), 403);
+
+        $this->authorize('update', $project);
+
         return view('projects.show', compact('project'));
     }
     
@@ -62,7 +72,12 @@ class ProjectsController extends Controller
 
     public function update(Project $project)
     {
-        $project->update(request(['title', 'description']));
+        $attributes = request()->validate([
+            'title' => ['required', 'min:3'],
+            'description' => ['required', 'min:3']
+        ]);
+
+        $project->update($attributes);
 
         return redirect('/projects');
     }
